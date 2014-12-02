@@ -1,16 +1,16 @@
 import socket
-from thread import *
+from _thread import *
 
 def process(s):
-	print(s)
+	print(s.decode("utf-8"))
 
 def main():
 	players = []
 
 	sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-	sock.bind(("", 50000))
-	sock.listen(5)
 	sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+	sock.bind(("localhost", 50000))
+	sock.listen(5)
 
 	while True:
 		c, addr = sock.accept()
@@ -19,7 +19,7 @@ def main():
 		start_new_thread(threadLoop, (c,))
 
 def threadLoop(c):
-	c.send("Started")
+	c.send("Started".encode("utf-8"))
 	while True:
 		process(c.recv(1024))
 
