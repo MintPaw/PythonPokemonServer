@@ -1,7 +1,7 @@
 import socket
+import pickle
 from _thread import *
 
-playerNumber = 0
 connections = []
 needGame = []
 
@@ -18,8 +18,11 @@ def makeGame():
 	con1 = needGame.pop(0)
 	con2 = needGame.pop(0)
 
-	connections.pop(connections.index(con1))
-	connections.pop(connections.index(con2))
+	data = {}
+	data["mType"] = "start"
+	data["players"] = [connections.index(con1), connections.index(con2)]
+
+	broadcast(data)
 
 def main():
 	global connections
@@ -38,17 +41,22 @@ def main():
 		connections.append(c)
 		needGame.append(c)
 
-		if (len(needGame) >= 2): makeGame()
+		debugPrint("A player has connected")
+
+		data = {}
+		data["mType"] = "init"
+		data["playerNumber"] = len(connections) - 1
+
+		c.send(pickle.dumps(data))
 
 		start_new_thread(threadLoop, (c,))
 
+		if (len(needGame) >= 2): makeGame()
+
+def broadcast(p):
+	for i in connections: i.send(pickle.dumps(p))
+
 def threadLoop(c):
-	global playerNumber
-
-	c.send(str("playerNumber:" + str(playerNumber)).encode("utf-8"))
-	debugPrint("A player has connected")
-
-	playerNumber += 1
 
 	while True:
 		process(c.recv(1024))
