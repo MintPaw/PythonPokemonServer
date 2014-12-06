@@ -5,11 +5,12 @@ from _thread import *
 connections = []
 needGame = []
 
-def process(s):
-	debugPrint(s.decode("utf-8"))
+def process(d):
+	print(d)
 
-def debugPrint(m):
-	print(m)
+	if d["mType"] == "start":
+		d["mType"] = "playerData"
+		broadcast(d)
 
 def makeGame():
 	global needGame
@@ -21,6 +22,8 @@ def makeGame():
 	data = {}
 	data["mType"] = "start"
 	data["players"] = [connections.index(con1), connections.index(con2)]
+
+	print("Game was made between players " + str(data["players"][0]) + " and " + str(data["players"][1]))
 
 	broadcast(data)
 
@@ -41,7 +44,7 @@ def main():
 		connections.append(c)
 		needGame.append(c)
 
-		debugPrint("A player has connected")
+		print("A player has connected")
 
 		data = {}
 		data["mType"] = "init"
@@ -57,9 +60,8 @@ def broadcast(p):
 	for i in connections: i.send(pickle.dumps(p))
 
 def threadLoop(c):
-
 	while True:
-		process(c.recv(1024))
+		process(pickle.loads(c.recv(4096)))
 
 
 if (__name__ == "__main__"): main()
