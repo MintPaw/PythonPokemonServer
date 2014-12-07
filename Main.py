@@ -8,6 +8,9 @@ needGame = []
 def process(d):
 	print(d)
 
+	if d["mType"] == "move":
+		broadcast(d)
+
 	if d["mType"] == "start":
 		d["mType"] = "playerData"
 		broadcast(d)
