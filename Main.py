@@ -34,6 +34,8 @@ def main():
 	global connections
 	global needGame
 
+	print("Server started")
+
 	players = []
 
 	sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
